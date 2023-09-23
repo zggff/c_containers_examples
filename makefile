@@ -9,6 +9,8 @@ hashtable: build/hashtable
 string_builder: build/string_builder
 	./$<
 
+string_view: build/string_view
+	./$<
 
 
 build/%: %.c
