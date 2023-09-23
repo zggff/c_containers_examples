@@ -8,6 +8,24 @@
 #define CAPACITY 10
 #define MAX_LEN 20
 
+typedef struct hash_item {
+    char key[MAX_LEN];
+    size_t value;
+    struct hash_item *next;
+} hash_item;
+
+typedef struct {
+    hash_item *inner[CAPACITY];
+    size_t size;
+} hashtable;
+
+size_t hash_function(char *str);
+void ht_print(hashtable *hs);
+void ht_insert(hashtable *hs, char *key, size_t value);
+size_t *ht_get(hashtable *hs, char *key);
+void ht_remove(hashtable *hs, char *key);
+void ht_set(hashtable *hs, char *key, size_t value);
+
 size_t hash_function(char *str) {
     size_t result = 0;
     size_t len = strnlen(str, MAX_LEN);
@@ -18,18 +36,7 @@ size_t hash_function(char *str) {
     return result;
 }
 
-typedef struct hash_item {
-    char key[MAX_LEN];
-    int value;
-    struct hash_item *next;
-} hash_item;
-
-typedef struct {
-    hash_item *inner[CAPACITY];
-    size_t size;
-} hashtable;
-
-void hashtable_print(hashtable *hs) {
+void ht_print(hashtable *hs) {
     for (int i = 0; i < CAPACITY; i++) {
         if (hs->inner[i] == NULL) {
             printf("%i\t---\n", i);
@@ -37,14 +44,14 @@ void hashtable_print(hashtable *hs) {
             printf("%i", i);
             hash_item *next = hs->inner[i];
             while (next != NULL) {
-                printf("\t%s: %i\n", next->key, next->value);
+                printf("\t%s: %zu\n", next->key, next->value);
                 next = next->next;
             }
         }
     }
 }
 
-void hashtable_insert(hashtable *hs, char *key, int value) {
+void ht_insert(hashtable *hs, char *key, size_t value) {
     size_t hash = hash_function(key);
     size_t len = strnlen(key, MAX_LEN);
     hash_item *tmp = (hash_item *)malloc(sizeof(hash_item));
@@ -54,7 +61,7 @@ void hashtable_insert(hashtable *hs, char *key, int value) {
     hs->inner[hash] = tmp;
 }
 
-int *hashtable_get(hashtable *hs, char *key) {
+size_t *ht_get(hashtable *hs, char *key) {
     size_t hash = hash_function(key);
     size_t len = strnlen(key, MAX_LEN);
     hash_item *tmp = hs->inner[hash];
@@ -67,7 +74,7 @@ int *hashtable_get(hashtable *hs, char *key) {
     return NULL;
 }
 
-void hashtable_remove(hashtable *hs, char *key) {
+void ht_remove(hashtable *hs, char *key) {
     size_t hash = hash_function(key);
     size_t len = strnlen(key, MAX_LEN);
     hash_item *tmp = hs->inner[hash];
@@ -87,26 +94,26 @@ void hashtable_remove(hashtable *hs, char *key) {
     free(tmp);
 }
 
-void hashtable_set(hashtable *hs, char *key, int value) {
-    int *tmp = hashtable_get(hs, key);
+void ht_set(hashtable *hs, char *key, size_t value) {
+    size_t *tmp = ht_get(hs, key);
     if (tmp != NULL) {
         (*tmp) = value;
     } else {
-        hashtable_insert(hs, key, value);
+        ht_insert(hs, key, value);
     }
 }
 
 int main() {
     hashtable hs = {0};
-    hashtable_insert(&hs, "Jacob", 12);
-    hashtable_insert(&hs, "zggff", 69);
-    hashtable_print(&hs);
+    ht_insert(&hs, "Jacob", 12);
+    ht_insert(&hs, "zggff", 69);
+    ht_print(&hs);
     printf("\n\n");
-    hashtable_set(&hs, "Jacob", 420);
-    hashtable_print(&hs);
+    ht_set(&hs, "Jacob", 420);
+    ht_print(&hs);
     printf("\n\n");
-    hashtable_set(&hs, "2317", 2317);
-    hashtable_print(&hs);
+    ht_set(&hs, "2317", 2317);
+    ht_print(&hs);
 
     return 0;
 }
